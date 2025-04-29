@@ -1,4 +1,3 @@
-
 import { DogReport, ReportResponse } from '../types/dog';
 
 const API_URL = 'http://localhost:5000';
@@ -15,24 +14,17 @@ export const submitDogReport = async (formData: DogReport): Promise<ReportRespon
     const body = `${formData.status} dog ${formData.description} Location:${formData.location.lat},${formData.location.lon} Phone:${formData.phone}`;
     requestFormData.append('Body', body);
     
-    // For the image, we'll directly append the file as MediaUrl0
+    // For the image, we need to ensure the server receives a valid image URL
     if (formData.image) {
-      // Since the backend expects a URL, we need to upload the file separately first
-      // For the demo, we'll use a placeholder image URL for testing
-      requestFormData.append('MediaUrl0', 'https://th.bing.com/th/id/OIP.SPwDmj7siBHlEngxpeadlwEsDj?rs=1&pid=ImgDetMain');
+      // Using a working image URL that we know the server can access
+      // In a real app, you'd upload the image to your own server first
+      requestFormData.append('MediaUrl0', 'https://images.dog.ceo/breeds/retriever-golden/n02099601_1722.jpg');
       requestFormData.append('MediaContentType0', 'image/jpeg');
-      
-      // In a real application, you would upload the image to a server first
-      // then use the returned URL as MediaUrl0
-      
-      // Example:
-      // const imageUploadResponse = await uploadImage(formData.image);
-      // requestFormData.append('MediaUrl0', imageUploadResponse.imageUrl);
     }
 
     console.log('Submitting dog report with:');
     console.log('- Body:', body);
-    console.log('- Image type:', formData.image?.type);
+    console.log('- Using placeholder image URL for MediaUrl0');
 
     const response = await fetch(`${API_URL}/whatsapp`, {
       method: 'POST',
