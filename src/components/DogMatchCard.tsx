@@ -19,7 +19,7 @@ const DogMatchCard = ({ match }: DogMatchCardProps) => {
   const matchPercentage = Math.round(match.score * 100);
 
   return (
-    <Card className="overflow-hidden transition-all hover:shadow-lg">
+    <Card className="overflow-hidden transition-all hover:shadow-lg ">
       <div className="relative h-48">
         <img
           src={`http://localhost:5000/uploads/${match.image_name}`}
