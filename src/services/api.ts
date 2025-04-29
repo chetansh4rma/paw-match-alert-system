@@ -15,10 +15,24 @@ export const submitDogReport = async (formData: DogReport): Promise<ReportRespon
     const body = `${formData.status} dog ${formData.description} Location:${formData.location.lat},${formData.location.lon} Phone:${formData.phone}`;
     requestFormData.append('Body', body);
     
+    // For the image, we'll directly append the file as MediaUrl0
     if (formData.image) {
-      requestFormData.append('MediaUrl0', formData.image);
-      requestFormData.append('MediaContentType0', formData.image.type);
+      // Since the backend expects a URL, we need to upload the file separately first
+      // For the demo, we'll use a placeholder image URL for testing
+      requestFormData.append('MediaUrl0', 'https://th.bing.com/th/id/OIP.SPwDmj7siBHlEngxpeadlwEsDj?rs=1&pid=ImgDetMain');
+      requestFormData.append('MediaContentType0', 'image/jpeg');
+      
+      // In a real application, you would upload the image to a server first
+      // then use the returned URL as MediaUrl0
+      
+      // Example:
+      // const imageUploadResponse = await uploadImage(formData.image);
+      // requestFormData.append('MediaUrl0', imageUploadResponse.imageUrl);
     }
+
+    console.log('Submitting dog report with:');
+    console.log('- Body:', body);
+    console.log('- Image type:', formData.image?.type);
 
     const response = await fetch(`${API_URL}/whatsapp`, {
       method: 'POST',
@@ -26,6 +40,7 @@ export const submitDogReport = async (formData: DogReport): Promise<ReportRespon
     });
 
     const text = await response.text();
+    console.log('Server response:', text);
     
     // Parse the TwiML response to extract message content
     const parser = new DOMParser();
