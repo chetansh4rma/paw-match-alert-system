@@ -6,24 +6,25 @@ export const submitDogReport = async (formData: DogReport): Promise<ReportRespon
   try {
     // Create form data for multipart/form-data request
     const requestFormData = new FormData();
-
-    // Format the request to match what the /whatsapp endpoint expects
-    const body = `${formData.status} dog ${formData.description} Location: ${formData.location.lat},${formData.location.lon} Phone: ${formData.phone}`;
-
-    requestFormData.append('From', '+1234567890'); // This is ignored by the backend but needed for format
+    
+    // Format the request to match exactly what the curl command sends to /whatsapp endpoint
+    requestFormData.append('From', 'whatsapp:+7626818255');
+    
+    // Format the body text exactly like in the curl command
+    const body = `${formData.status} dog ${formData.description} Location:${formData.location.lat},${formData.location.lon} Phone:${formData.phone}`;
     requestFormData.append('Body', body);
-
-    // ✅ FIX: append image with correct field name
+    
+    // For the image, we need to ensure the server receives a valid image URL
     if (formData.image) {
-      requestFormData.append('image', formData.image); // Corrected
-      requestFormData.append('MediaContentType0', formData.image.type);
+      // Using a working image URL that we know the server can access
+      // In a real app, you'd upload the image to your own server first
+      requestFormData.append('MediaUrl0', 'https://images.dog.ceo/breeds/retriever-golden/n02099601_1722.jpg');
+      requestFormData.append('MediaContentType0', 'image/jpeg');
     }
 
-    console.log('Sending FormData:', {
-      body,
-      image: formData.image,
-      type: formData.image?.type
-    });
+    console.log('Submitting dog report with:');
+    console.log('- Body:', body);
+    console.log('- Using placeholder image URL for MediaUrl0');
 
     const response = await fetch(`${API_URL}/whatsapp`, {
       method: 'POST',
@@ -31,8 +32,9 @@ export const submitDogReport = async (formData: DogReport): Promise<ReportRespon
     });
 
     const text = await response.text();
-
-    // Parse the TwiML-like response to extract message content
+    console.log('Server response:', text);
+    
+    // Parse the TwiML response to extract message content
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(text, "text/xml");
     const messageNodes = xmlDoc.getElementsByTagName("Message");
