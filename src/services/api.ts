@@ -1,6 +1,6 @@
 import { DogReport, ReportResponse } from '../types/dog';
 
-const API_URL = 'http://localhost:5000';
+const API_URL = 'https://foundpaw.onrender.com';
 
 export const submitDogReport = async (formData: DogReport): Promise<ReportResponse> => {
   try {
