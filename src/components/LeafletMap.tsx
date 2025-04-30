@@ -3,6 +3,21 @@ import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
+// Fix for missing marker icons in Leaflet
+import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
+import iconUrl from 'leaflet/dist/images/marker-icon.png';
+import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
+
+// Delete the default icon
+delete L.Icon.Default.prototype._getIconUrl;
+
+// Set the default icon paths explicitly
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl,
+  iconUrl,
+  shadowUrl,
+});
+
 interface LeafletMapProps {
   center: [number, number];
   onChange: (lat: number, lng: number) => void;
