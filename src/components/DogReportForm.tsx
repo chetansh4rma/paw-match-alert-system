@@ -1,5 +1,4 @@
-
-import { useState, ChangeEvent, FormEvent } from 'react';
+import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -34,7 +33,7 @@ const DogReportForm = ({ onSubmit, isSubmitting }: DogReportFormProps) => {
   const [locationChanged, setLocationChanged] = useState(false);
 
   // Update location when geolocation is available
-  useState(() => {
+  useEffect(() => {
     if (latitude && longitude && !locationChanged) {
       setFormData(prev => ({
         ...prev,
@@ -44,7 +43,7 @@ const DogReportForm = ({ onSubmit, isSubmitting }: DogReportFormProps) => {
         }
       }));
     }
-  });
+  }, [latitude, longitude, locationChanged]);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -129,13 +128,33 @@ const DogReportForm = ({ onSubmit, isSubmitting }: DogReportFormProps) => {
       return;
     }
     
+    // Use current location if not manually set and coordinates are available
     if (formData.location.lat === 0 && formData.location.lon === 0) {
-      toast({
-        title: "Missing location",
-        description: "Please provide a location",
-        variant: "destructive"
-      });
-      return;
+      if (latitude && longitude) {
+        setFormData(prev => ({
+          ...prev,
+          location: {
+            lat: latitude,
+            lon: longitude
+          }
+        }));
+        // Submit with the updated location
+        onSubmit({
+          ...formData,
+          location: {
+            lat: latitude,
+            lon: longitude
+          }
+        });
+        return;
+      } else {
+        toast({
+          title: "Missing location",
+          description: "Please provide a location or enable location services",
+          variant: "destructive"
+        });
+        return;
+      }
     }
     
     onSubmit(formData);

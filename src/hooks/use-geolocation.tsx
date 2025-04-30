@@ -45,15 +45,28 @@ export function useGeolocation() {
 
     const options = {
       enableHighAccuracy: true,
-      timeout: 5000,
+      timeout: 10000, // Extended timeout for slower connections
       maximumAge: 0
     };
 
+    // Get current position
     navigator.geolocation.getCurrentPosition(
       successHandler,
       errorHandler,
       options
     );
+
+    // Also set up a watcher to update if the position changes
+    const watchId = navigator.geolocation.watchPosition(
+      successHandler,
+      errorHandler,
+      options
+    );
+
+    // Cleanup function to remove the watcher
+    return () => {
+      navigator.geolocation.clearWatch(watchId);
+    };
   }, []);
 
   return state;

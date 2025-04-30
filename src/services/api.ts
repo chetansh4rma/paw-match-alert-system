@@ -1,6 +1,10 @@
+
 import { DogReport, ReportResponse } from '../types/dog';
 
-const API_URL = 'https://foundpaw.onrender.com';
+// Use proper API URL based on environment
+const API_URL = process.env.NODE_ENV === 'production' 
+  ? 'https://foundpaw.onrender.com' 
+  : 'http://localhost:5000';
 
 export const submitDogReport = async (formData: DogReport): Promise<ReportResponse> => {
   try {
@@ -16,15 +20,20 @@ export const submitDogReport = async (formData: DogReport): Promise<ReportRespon
     
     // For the image, we need to ensure the server receives a valid image URL
     if (formData.image) {
-      // Using a working image URL that we know the server can access
-      // In a real app, you'd upload the image to your own server first
-      requestFormData.append('MediaUrl0', 'https://images.dog.ceo/breeds/retriever-golden/n02099601_1722.jpg');
+      // In production we need to use a different approach
+      // The server expects a URL, but we have a File object
+      // For now, we'll use a placeholder image that works for demo purposes
+      // In a real app, you'd upload the image to cloud storage first and then use that URL
+      const imageUrl = 'https://images.dog.ceo/breeds/retriever-golden/n02099601_1722.jpg';
+      requestFormData.append('MediaUrl0', imageUrl);
       requestFormData.append('MediaContentType0', 'image/jpeg');
+      
+      console.log('Image submitted with URL:', imageUrl);
     }
 
     console.log('Submitting dog report with:');
     console.log('- Body:', body);
-    console.log('- Using placeholder image URL for MediaUrl0');
+    console.log('- API URL:', API_URL);
 
     const response = await fetch(`${API_URL}/whatsapp`, {
       method: 'POST',
