@@ -22,7 +22,7 @@ const DogMatchCard = ({ match }: DogMatchCardProps) => {
     <Card className="overflow-hidden transition-all hover:shadow-lg ">
       <div className="relative h-48">
         <img
-          src={`http://localhost:5000/uploads/${match.image_name}`}
+           src={`https://foundpaw.onrender.com/uploads/${match.image_name}`}
           alt="Dog"
           className="w-full h-full object-cover"
           onError={(e) => {
