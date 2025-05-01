@@ -8,14 +8,11 @@ import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
 
-// Delete the default icon
-delete L.Icon.Default.prototype._getIconUrl;
-
 // Set the default icon paths explicitly
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl,
-  iconUrl,
-  shadowUrl,
+  iconRetinaUrl: iconRetinaUrl,
+  iconUrl: iconUrl,
+  shadowUrl: shadowUrl,
 });
 
 interface LeafletMapProps {
@@ -46,6 +43,36 @@ const LeafletMap = ({ center, onChange }: LeafletMapProps) => {
           onChange(position.lat, position.lng);
         }
       });
+
+      // Automatically update location when map is clicked
+      mapRef.current.on('click', function(e) {
+        const clickPos = e.latlng;
+        if (markerRef.current) {
+          markerRef.current.setLatLng(clickPos);
+        }
+        onChange(clickPos.lat, clickPos.lng);
+      });
+
+      // Watch for location changes
+      mapRef.current.locate({
+        setView: true,
+        maxZoom: 16,
+        enableHighAccuracy: true,
+        watch: true
+      });
+
+      // When location is found, update marker and center
+      mapRef.current.on('locationfound', function(e) {
+        const pos = e.latlng;
+        if (markerRef.current) {
+          markerRef.current.setLatLng(pos);
+        }
+        // Only trigger onChange when the location is first found to avoid continuous updates
+        if (!locationFoundRef.current) {
+          onChange(pos.lat, pos.lng);
+          locationFoundRef.current = true;
+        }
+      });
     } else {
       // Update map view and marker position if center changes
       mapRef.current.setView(center);
@@ -57,12 +84,16 @@ const LeafletMap = ({ center, onChange }: LeafletMapProps) => {
     // Cleanup function
     return () => {
       if (mapRef.current) {
+        mapRef.current.stopLocate();
         mapRef.current.remove();
         mapRef.current = null;
         markerRef.current = null;
       }
     };
   }, [center, onChange]);
+
+  // Track if location has been found already
+  const locationFoundRef = useRef(false);
 
   return <div id="map" style={{ height: '100%', width: '100%' }}></div>;
 };
