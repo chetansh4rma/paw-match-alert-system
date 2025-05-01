@@ -1,5 +1,5 @@
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -23,6 +23,7 @@ interface LeafletMapProps {
 const LeafletMap = ({ center, onChange }: LeafletMapProps) => {
   const mapRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
+  const locationFoundRef = useRef(false);
 
   useEffect(() => {
     // Initialize map if it doesn't exist yet
@@ -91,9 +92,6 @@ const LeafletMap = ({ center, onChange }: LeafletMapProps) => {
       }
     };
   }, [center, onChange]);
-
-  // Track if location has been found already
-  const locationFoundRef = useRef(false);
 
   return <div id="map" style={{ height: '100%', width: '100%' }}></div>;
 };

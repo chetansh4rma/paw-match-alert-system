@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useGeolocation } from '@/hooks/use-geolocation';
 import { DogReport } from '@/types/dog';
 import LeafletMap from './LeafletMap';
+import { MapPin, AlertCircle } from 'lucide-react';
 
 interface DogReportFormProps {
   onSubmit: (data: DogReport) => Promise<void>;
@@ -16,7 +17,14 @@ interface DogReportFormProps {
 
 const DogReportForm = ({ onSubmit, isSubmitting }: DogReportFormProps) => {
   const { toast } = useToast();
-  const { latitude, longitude, loading: loadingLocation, error: locationError } = useGeolocation();
+  const { 
+    latitude, 
+    longitude, 
+    loading: loadingLocation, 
+    error: locationError, 
+    permissionGranted,
+    requestPermission 
+  } = useGeolocation();
   
   const [formData, setFormData] = useState<DogReport>({
     status: 'lost',
@@ -31,6 +39,11 @@ const DogReportForm = ({ onSubmit, isSubmitting }: DogReportFormProps) => {
   
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [locationChanged, setLocationChanged] = useState(false);
+
+  // Request location permission when component loads
+  useEffect(() => {
+    requestPermission();
+  }, [requestPermission]);
 
   // Update location when geolocation is available
   useEffect(() => {
@@ -206,7 +219,29 @@ const DogReportForm = ({ onSubmit, isSubmitting }: DogReportFormProps) => {
         </div>
         
         <div>
-          <Label htmlFor="location">Location</Label>
+          <Label htmlFor="location" className="flex items-center gap-2">
+            <MapPin className="h-4 w-4" /> Location
+          </Label>
+
+          {!permissionGranted && !locationChanged && (
+            <div className="p-3 mb-3 bg-amber-50 border border-amber-200 rounded-md flex items-start gap-2">
+              <AlertCircle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-amber-800">Location access needed</p>
+                <p className="text-xs text-amber-700">We need your location to help find nearby dogs</p>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => requestPermission()} 
+                  className="mt-2 bg-amber-100 border-amber-200 hover:bg-amber-200"
+                >
+                  Allow location access
+                </Button>
+              </div>
+            </div>
+          )}
+          
           <div className="h-[300px] rounded-md overflow-hidden border mt-2">
             {(latitude || longitude || locationChanged) ? (
               <LeafletMap 
@@ -218,9 +253,18 @@ const DogReportForm = ({ onSubmit, isSubmitting }: DogReportFormProps) => {
                 {loadingLocation ? (
                   <p>Loading location...</p>
                 ) : (
-                  <p className="text-muted-foreground">
-                    {locationError || "Location unavailable. Please allow location access."}
-                  </p>
+                  <div className="text-center p-4">
+                    <p className="text-muted-foreground mb-2">
+                      {locationError || "Location unavailable. Please allow location access."}
+                    </p>
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={() => requestPermission()}
+                    >
+                      Enable Location Services
+                    </Button>
+                  </div>
                 )}
               </div>
             )}
