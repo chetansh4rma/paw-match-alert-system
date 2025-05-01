@@ -25,7 +25,7 @@ export const submitDogReport = async (formData: DogReport): Promise<ReportRespon
       // For now, we'll use a placeholder image that works for demo purposes
       // In a real app, you'd upload the image to cloud storage first and then use that URL
       const imageUrl = 'https://images.dog.ceo/breeds/retriever-golden/n02099601_1722.jpg';
-      requestFormData.append('MediaUrl0', imageUrl);
+       requestFormData.append('image', formData.image); 
       requestFormData.append('MediaContentType0', 'image/jpeg');
       
       console.log('Image submitted with URL:', imageUrl);
