@@ -109,49 +109,6 @@ const Index = () => {
             </div>
           </div>
         </section>
-        
-        <section className="py-16 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center">
-              <h2 className="text-3xl font-bold mb-6 text-pawmatch-purple">Success Stories</h2>
-              <p className="text-lg text-gray-700 mb-12">
-                PawMatch has helped reunite hundreds of dogs with their owners. Here are some of their stories.
-              </p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md">
-                  <img 
-                    src="https://images.unsplash.com/photo-1582562124811-c09040d0a901" 
-                    alt="Success story" 
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="p-6">
-                    <h3 className="text-xl font-semibold mb-2">Max's Journey Home</h3>
-                    <p className="text-gray-600">
-                      "After 2 weeks of searching, PawMatch connected me with someone who found Max just 3 miles away. I can't express how grateful I am!"
-                    </p>
-                    <p className="mt-4 text-sm font-medium text-pawmatch-purple">- Sarah T.</p>
-                  </div>
-                </div>
-                
-                <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md">
-                  <img 
-                    src="https://images.unsplash.com/photo-1466721591366-2d5fba72006d" 
-                    alt="Success story" 
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="p-6">
-                    <h3 className="text-xl font-semibold mb-2">Reunited with Bella</h3>
-                    <p className="text-gray-600">
-                      "I found a dog wandering in my neighborhood and posted on PawMatch. Within hours, I was connected with her worried owner!"
-                    </p>
-                    <p className="mt-4 text-sm font-medium text-pawmatch-purple">- Michael R.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
       
       <Footer />

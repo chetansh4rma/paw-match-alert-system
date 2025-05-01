@@ -29,7 +29,7 @@ const MatchResults = ({ matches, onClose }: MatchResultsProps) => {
           </div>
         </div>
         
-        <ScrollArea className="flex-grow px-6 pb-6" style={{ maxHeight: isMobile ? '60vh' : '70vh' }}>
+        <ScrollArea className="flex-grow px-6 pb-6" style={{ maxHeight: isMobile ? '70vh' : '75vh' }}>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {matches.map((match) => (
               <DogMatchCard key={match._id} match={match} />
