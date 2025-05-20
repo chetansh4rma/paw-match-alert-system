@@ -1,3 +1,4 @@
+
 import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,7 +8,6 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { useGeolocation } from '@/hooks/use-geolocation';
 import { DogReport } from '@/types/dog';
-import LeafletMap from './LeafletMap';
 import { MapPin, AlertCircle } from 'lucide-react';
 
 interface DogReportFormProps {
@@ -38,7 +38,6 @@ const DogReportForm = ({ onSubmit, isSubmitting }: DogReportFormProps) => {
   });
   
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [locationChanged, setLocationChanged] = useState(false);
 
   // Request location permission when component loads
   useEffect(() => {
@@ -47,7 +46,7 @@ const DogReportForm = ({ onSubmit, isSubmitting }: DogReportFormProps) => {
 
   // Update location when geolocation is available
   useEffect(() => {
-    if (latitude && longitude && !locationChanged) {
+    if (latitude && longitude) {
       setFormData(prev => ({
         ...prev,
         location: {
@@ -56,7 +55,7 @@ const DogReportForm = ({ onSubmit, isSubmitting }: DogReportFormProps) => {
         }
       }));
     }
-  }, [latitude, longitude, locationChanged]);
+  }, [latitude, longitude]);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -70,17 +69,6 @@ const DogReportForm = ({ onSubmit, isSubmitting }: DogReportFormProps) => {
     setFormData(prev => ({
       ...prev,
       status: value as 'lost' | 'found'
-    }));
-  };
-
-  const handleLocationChange = (lat: number, lng: number) => {
-    setLocationChanged(true);
-    setFormData(prev => ({
-      ...prev,
-      location: {
-        lat,
-        lon: lng
-      }
     }));
   };
 
@@ -141,7 +129,7 @@ const DogReportForm = ({ onSubmit, isSubmitting }: DogReportFormProps) => {
       return;
     }
     
-    // Use current location if not manually set and coordinates are available
+    // Use current location if coordinates are available
     if (formData.location.lat === 0 && formData.location.lon === 0) {
       if (latitude && longitude) {
         setFormData(prev => ({
@@ -163,7 +151,7 @@ const DogReportForm = ({ onSubmit, isSubmitting }: DogReportFormProps) => {
       } else {
         toast({
           title: "Missing location",
-          description: "Please provide a location or enable location services",
+          description: "Please enable location services",
           variant: "destructive"
         });
         return;
@@ -223,53 +211,42 @@ const DogReportForm = ({ onSubmit, isSubmitting }: DogReportFormProps) => {
             <MapPin className="h-4 w-4" /> Location
           </Label>
 
-          {!permissionGranted && !locationChanged && (
-            <div className="p-3 mb-3 bg-amber-50 border border-amber-200 rounded-md flex items-start gap-2">
-              <AlertCircle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-amber-800">Location access needed</p>
-                <p className="text-xs text-amber-700">We need your location to help find nearby dogs</p>
+          <div className="p-4 mt-2 border rounded-md bg-muted/40">
+            {permissionGranted ? (
+              <div className="flex flex-col space-y-2">
+                <div className="flex items-center text-sm text-green-600">
+                  <AlertCircle className="h-4 w-4 mr-2" />
+                  Location access granted
+                </div>
+                {latitude && longitude ? (
+                  <p className="text-sm">
+                    Using your current location: {latitude.toFixed(4)}, {longitude.toFixed(4)}
+                  </p>
+                ) : (
+                  <p className="text-sm">Getting your location...</p>
+                )}
+              </div>
+            ) : (
+              <div className="flex flex-col space-y-3">
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium">Location access needed</p>
+                    <p className="text-xs text-muted-foreground">We need your location to help find nearby dogs</p>
+                  </div>
+                </div>
                 <Button 
                   type="button" 
-                  variant="outline" 
-                  size="sm" 
                   onClick={() => requestPermission()} 
-                  className="mt-2 bg-amber-100 border-amber-200 hover:bg-amber-200"
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
                 >
                   Allow location access
                 </Button>
               </div>
-            </div>
-          )}
-          
-          <div className="h-[300px] rounded-md overflow-hidden border mt-2">
-            {(latitude || longitude || locationChanged) ? (
-              <LeafletMap 
-                center={[formData.location.lat || latitude || 0, formData.location.lon || longitude || 0]}
-                onChange={handleLocationChange}
-              />
-            ) : (
-              <div className="h-full flex items-center justify-center bg-muted">
-                {loadingLocation ? (
-                  <p>Loading location...</p>
-                ) : (
-                  <div className="text-center p-4">
-                    <p className="text-muted-foreground mb-2">
-                      {locationError || "Location unavailable. Please allow location access."}
-                    </p>
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      onClick={() => requestPermission()}
-                    >
-                      Enable Location Services
-                    </Button>
-                  </div>
-                )}
-              </div>
             )}
           </div>
-          <p className="text-sm text-muted-foreground mt-1">Drag the marker to adjust the exact location</p>
         </div>
         
         <div>
